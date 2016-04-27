@@ -21,7 +21,7 @@ if (count($argv) > 1) {
 }
 
 foreach ($repos as $repo) {
-    $client->repository($repo)->then(function (RepositoryInterface $repo) {
+    $client->repository($repo)->subscribeCallback(function (RepositoryInterface $repo) {
         var_export($repo);
     });
 }

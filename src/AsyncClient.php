@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace WyriHaximus\Travis;
 
-use React\Promise\PromiseInterface;
+use Rx\ObservableInterface;
+use Rx\React\Promise;
 use WyriHaximus\Travis\Resource\Async\Repository;
 use WyriHaximus\Travis\Transport\Client as Transport;
 use WyriHaximus\Travis\Transport\Factory;
@@ -21,10 +22,11 @@ class AsyncClient
         $this->transport = $transport;
     }
 
-    public function repository(string $repository): PromiseInterface
+    public function repository(string $repository): ObservableInterface
     {
-        return $this->transport->request('repos/' . $repository)->then(function ($json) {
-            return resolve($this->transport->hydrate(Repository::class, $json['repo']));
-        });
+        return Promise::toObservable($this->transport->request('repos/' . $repository))
+            ->map(function ($json) : Repository {
+                return $this->transport->hydrate(Repository::class, $json['repo']);
+            });
     }
 }
